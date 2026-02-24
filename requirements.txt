@@ -1,0 +1,11 @@
+# Runtime dependency
+# ──────────────────
+# The Ren'Py engine is NOT distributed via PyPI.
+# Obtain the Ren'Py SDK from https://www.renpy.org/latest.html and point
+# parse_rpy.py at it via --renpy-sdk or the RENPY_SDK environment variable.
+
+# Optional: graph analysis and visualisation
+# ──────────────────────────────────────────
+# Uncomment the lines below and call build_networkx_graph() in parse_rpy.py.
+# networkx>=3.0
+# matplotlib>=3.5
