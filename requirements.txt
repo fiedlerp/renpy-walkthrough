@@ -1,0 +1,18 @@
+# Runtime dependency
+# ──────────────────
+# The Ren'Py engine is included as a git submodule at renpy-sdk/.
+# Initialise it with:
+#
+#   git submodule update --init
+#
+# or clone the repository with:
+#
+#   git clone --recurse-submodules <repo-url>
+#
+# No separate download from https://www.renpy.org/latest.html is needed.
+
+# Optional: graph analysis and visualisation
+# ──────────────────────────────────────────
+# Uncomment the lines below and call build_networkx_graph() in parse_rpy.py.
+# networkx>=3.0
+# matplotlib>=3.5
