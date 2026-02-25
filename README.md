@@ -14,18 +14,38 @@ visualisation libraries such as
 [networkx](https://networkx.org/),
 [Gephi](https://gephi.org/), or [d3.js](https://d3js.org/).
 
+## Getting started
+
+Ren'Py is included as a **git submodule** at `renpy-sdk/` (tracked at
+[renpy/renpy](https://github.com/renpy/renpy)), so no separate SDK download
+is required.
+
+### Clone (recommended)
+
+```bash
+git clone --recurse-submodules https://github.com/fiedlerp/renpy-walkthrough.git
+cd renpy-walkthrough
+```
+
+### Already cloned without `--recurse-submodules`?
+
+```bash
+git submodule update --init
+```
+
+### Updating Ren'Py to the latest commit
+
+```bash
+git submodule update --remote renpy-sdk
+git add renpy-sdk
+git commit -m "Update Ren'Py submodule"
+```
+
 ## Requirements
-
-### Ren'Py SDK
-
-`parse_rpy.py` uses the Ren'Py engine for parsing, so the SDK must be
-available.  Download it from <https://www.renpy.org/latest.html> and unpack
-it somewhere on your machine.
 
 ### Python
 
-Python 3.9 or newer (matching the version bundled with the Ren'Py SDK is
-recommended).
+Python 3.9 or newer.
 
 ### Optional dependencies
 
@@ -36,20 +56,26 @@ pip install networkx matplotlib   # for graph analysis / visualisation
 ## Usage
 
 ```bash
-# Parse a game directory and print the graph as JSON
-python parse_rpy.py /path/to/my-game --renpy-sdk /path/to/renpy-sdk
+# Parse a game directory – the bundled submodule is used automatically
+python parse_rpy.py /path/to/my-game
 
 # Write the graph to a file
-python parse_rpy.py /path/to/my-game --renpy-sdk /path/to/renpy-sdk \
-    --output graph.json
+python parse_rpy.py /path/to/my-game --output graph.json
 
-# Use the RENPY_SDK environment variable instead
+# Override the Ren'Py path (env var or flag)
 export RENPY_SDK=/path/to/renpy-sdk
 python parse_rpy.py /path/to/my-game
 
-# Run with the SDK's own Python (all Ren'Py extensions are pre-loaded)
-/path/to/renpy-sdk/lib/py3-linux-x86_64/python parse_rpy.py /path/to/my-game
+python parse_rpy.py /path/to/my-game --renpy-sdk /path/to/renpy-sdk
 ```
+
+### SDK resolution order
+
+`parse_rpy.py` resolves the Ren'Py SDK in this order (first match wins):
+
+1. `--renpy-sdk PATH` command-line argument
+2. `RENPY_SDK` environment variable
+3. `renpy-sdk/` submodule bundled with this repository
 
 ## Output format
 
@@ -82,7 +108,7 @@ python parse_rpy.py /path/to/my-game
 An annotated example script is included in [`example/script.rpy`](example/script.rpy).
 
 ```bash
-export RENPY_SDK=/path/to/renpy-sdk
+# No extra setup needed – the submodule provides Ren'Py automatically
 python parse_rpy.py example/
 ```
 

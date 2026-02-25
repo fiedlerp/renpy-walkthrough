@@ -8,12 +8,14 @@ menu choices).
 
 Requirements
 ------------
-The Ren'Py SDK must be accessible. Provide its path via one of:
+The Ren'Py engine is included as a git submodule at ``renpy-sdk/``.
+After cloning with ``--recurse-submodules`` (see README), no further
+setup is needed – the submodule is detected automatically.
+
+You may also override the path via:
 
 * The ``RENPY_SDK`` environment variable, or
 * The ``--renpy-sdk`` command-line argument.
-
-Download the Ren'Py SDK from: https://www.renpy.org/latest.html
 
 Usage
 -----
@@ -56,6 +58,19 @@ from typing import Any
 # ---------------------------------------------------------------------------
 # Ren'Py SDK path helpers
 # ---------------------------------------------------------------------------
+
+# Directory of this script – used to locate the bundled submodule.
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Path to the Ren'Py submodule bundled with this project.
+_SUBMODULE_PATH = os.path.join(_SCRIPT_DIR, "renpy-sdk")
+
+
+def _find_sdk_from_submodule() -> str | None:
+    """Return the submodule path if the Ren'Py package is present inside it."""
+    if os.path.isdir(os.path.join(_SUBMODULE_PATH, "renpy")):
+        return _SUBMODULE_PATH
+    return None
 
 
 def _find_sdk_from_env() -> str | None:
@@ -334,8 +349,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "Path to the Ren'Py SDK (the directory that contains the renpy/ "
-            "package). Defaults to the value of the RENPY_SDK environment "
-            "variable."
+            "package). Overrides the RENPY_SDK environment variable and the "
+            "bundled renpy-sdk/ submodule."
         ),
     )
     p.add_argument(
@@ -352,8 +367,13 @@ def main(argv: list[str] | None = None) -> int:
 
     # ------------------------------------------------------------------
     # 1. Locate and import Ren'Py.
+    #
+    # Resolution order (first match wins):
+    #   a) --renpy-sdk command-line argument
+    #   b) RENPY_SDK environment variable
+    #   c) bundled renpy-sdk/ git submodule (renpy-sdk/renpy/ must exist)
     # ------------------------------------------------------------------
-    sdk_path = args.renpy_sdk or _find_sdk_from_env()
+    sdk_path = args.renpy_sdk or _find_sdk_from_env() or _find_sdk_from_submodule()
     if sdk_path:
         _setup_renpy_path(sdk_path)
 
@@ -362,9 +382,11 @@ def main(argv: list[str] | None = None) -> int:
     except ImportError:
         print(
             "Error: Could not import the 'renpy' package.\n\n"
-            "Please provide the path to the Ren'Py SDK via --renpy-sdk or the\n"
-            "RENPY_SDK environment variable, or run this script with the\n"
-            "Ren'Py SDK's bundled Python interpreter.\n\n"
+            "Make sure the renpy-sdk submodule has been initialised:\n"
+            "    git submodule update --init\n\n"
+            "Or provide the SDK path explicitly:\n"
+            "    --renpy-sdk /path/to/renpy-sdk\n"
+            "    export RENPY_SDK=/path/to/renpy-sdk\n\n"
             "Download the SDK from: https://www.renpy.org/latest.html",
             file=sys.stderr,
         )
